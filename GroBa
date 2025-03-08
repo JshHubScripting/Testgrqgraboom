@@ -1,212 +1,185 @@
+-- Load AkaliNotif for notifications
+local Library = loadstring(game:HttpGet("https://pastebin.com/raw/6HMp1NDn"))()
+local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))()
+local Notify = AkaliNotif.Notify
 
-getgenv().Prediction = 0.1307
-getgenv().AirshotFunccc = false
-getgenv().Tracer = true
-getgenv().Partz = "LowerTorso"
-local CC = game:GetService("Workspace").CurrentCamera
-local LocalPlayer = game.Players.LocalPlayer
-local UserInputService = game:GetService("UserInputService")
-local Locking = false
-local Tracer = Drawing.new("Image")
+-- Show execution notification
+Notify({
+    Description = "N4.SHH",
+    Title = "Silent aim?!?! please don’t skid💀💀",
+    Duration = 7,
+})
 
--- Create Mobile UI Button (Black, Transparent, Rounded)
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-local AimlockButton = Instance.new("TextButton", ScreenGui)
-local UICorner = Instance.new("UICorner", AimlockButton)
+-- Create UI
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local N4Button = Instance.new("TextButton")
+local FOVButton = Instance.new("TextButton")
 
-AimlockButton.Size = UDim2.new(0.2, 0, 0.1, 0) -- Slightly larger
-AimlockButton.Position = UDim2.new(0.75, 0, 0.8, 0) -- Bottom-right
-AimlockButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black
-AimlockButton.BackgroundTransparency = 0.3 -- Semi-transparent
-AimlockButton.Text = "Faded.RBX"
-AimlockButton.Font = Enum.Font.Arcade -- Arcade-style font
-AimlockButton.TextScaled = true
-AimlockButton.TextColor3 = Color3.new(1, 1, 1) -- Default white (will change with rainbow effect)
+ScreenGui.Parent = game.CoreGui
 
-UICorner.CornerRadius = UDim.new(0.3, 0) -- Rounded edges
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.Size = UDim2.new(0, 120, 0, 90) -- Slightly larger rectangle
+Frame.Position = UDim2.new(0, 10, 0, 10)
+Frame.Draggable = true
+Frame.Active = true
+Frame.BorderSizePixel = 0
+Frame.BackgroundTransparency = 0.3
+Frame.BorderSizePixel = 10
+Frame.ClipsDescendants = true
 
--- Function to Animate Rainbow Text
-spawn(function()
-    while true do
-        for i = 0, 1, 0.01 do
-            AimlockButton.TextColor3 = Color3.fromHSV(i, 1, 1) -- HSV Rainbow effect
-            wait(0.05) -- Adjust speed
+-- Function to apply rainbow effect
+local function applyRainbowEffect(button)
+    spawn(function()
+        while true do
+            for i = 0, 255, 5 do
+                button.TextColor3 = Color3.fromHSV(i / 255, 1, 1)
+                wait(0.05)
+            end
         end
-    end
-end)
-
--- Notification System (Scrolling UI)
-local NotifUI = Instance.new("ScreenGui")
-local Holder = Instance.new("ScrollingFrame")
-local Sorter = Instance.new("UIListLayout")
-
-NotifUI.Name = "NotifUI"
-NotifUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-NotifUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-Holder.Name = "Holder"
-Holder.Parent = NotifUI
-Holder.Active = true
-Holder.AnchorPoint = Vector2.new(1, 0)
-Holder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Holder.BackgroundTransparency = 1.000
-Holder.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Holder.BorderSizePixel = 0
-Holder.Position = UDim2.new(1, 0, 0, 0)
-Holder.Size = UDim2.new(0.25, 0, 1, 0)
-Holder.CanvasSize = UDim2.new(0, 0, 0, 0)
-
-Sorter.Name = "Sorter"
-Sorter.Parent = Holder
-Sorter.HorizontalAlignment = Enum.HorizontalAlignment.Center
-Sorter.SortOrder = Enum.SortOrder.LayoutOrder
-Sorter.VerticalAlignment = Enum.VerticalAlignment.Bottom
-Sorter.Padding = UDim.new(0, 10)
-
-function CreateNotification(Options)
-    local Default = {
-        Buttons = {
-            [1] = {
-                Title = 'Dismiss',
-                ClosesUI = true,
-                Callback = function() end
-            }
-        },
-        Title = 'Notification Title',
-        Content = 'Placeholder notification content',
-        Length = 5,
-        NeverExpire = false
-    }
-    Options = SetDefault(Options, Default)
-
-    local Dismiss = Instance.new("Frame")
-    local UICorner = Instance.new("UICorner")
-    local TextLabel = Instance.new("TextLabel")
-    local TextLabel_2 = Instance.new("TextLabel")
-    local TextButton = Instance.new("TextButton")
-    local UICorner_2 = Instance.new("UICorner")
-
-    Dismiss.Name = "Notification"
-    Dismiss.Parent = Holder
-    Dismiss.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    Dismiss.BackgroundTransparency = 0.300
-    Dismiss.BorderColor3 = Color3.fromRGB(27, 42, 53)
-    Dismiss.Position = UDim2.new(0.0996219441, 0, 0.646335304, 0)
-    Dismiss.Size = UDim2.new(0, 262, 0, 132)
-    Dismiss.Visible = false
-
-    UICorner.Parent = Dismiss
-
-    TextLabel.Parent = Dismiss
-    TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    TextLabel.BackgroundTransparency = 1.000
-    TextLabel.BorderColor3 = Color3.fromRGB(27, 42, 53)
-    TextLabel.Position = UDim2.new(0.0572519079, 0, 0.0530303046, 0)
-    TextLabel.Size = UDim2.new(0, 194, 0, 29)
-    TextLabel.Font = Enum.Font.GothamMedium
-    TextLabel.Text = Options.Title
-    TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    TextLabel.TextSize = 16.000
-    TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-    TextLabel_2.Parent = Dismiss
-    TextLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    TextLabel_2.BackgroundTransparency = 1.000
-    TextLabel_2.BorderColor3 = Color3.fromRGB(27, 42, 53)
-    TextLabel_2.Position = UDim2.new(0.0572519079, 0, 0.303030312, 0)
-    TextLabel_2.Size = UDim2.new(0, 233, 0, 52)
-    TextLabel_2.Font = Enum.Font.Gotham
-    TextLabel_2.Text = Options.Content
-    TextLabel_2.TextColor3 = Color3.fromRGB(234, 234, 234)
-    TextLabel_2.TextSize = 14.000
-    TextLabel_2.TextWrapped = true
-    TextLabel_2.TextXAlignment = Enum.TextXAlignment.Left
-    TextLabel_2.TextYAlignment = Enum.TextYAlignment.Top
-
-    if Options.Buttons[1] then
-        TextButton.Parent = Dismiss
-        TextButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        TextButton.BorderColor3 = Color3.fromRGB(27, 42, 53)
-        TextButton.Position = UDim2.new(0.0572519079, 0, 0.696969688, 0)
-        TextButton.Size = UDim2.new(0, 233, 0, 29)
-        TextButton.Font = Enum.Font.GothamMedium
-        TextButton.Text = Options.Buttons[1].Title or "Dismiss"
-        TextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-        TextButton.TextSize = 16.000
-        TextButton.TextStrokeColor3 = Color3.fromRGB(31, 33, 35)
-        UICorner_2.CornerRadius = UDim.new(0, 6)
-        UICorner_2.Parent = TextButton
-        TextButton.MouseButton1Click:Connect(function()
-            if Options.Buttons[1].Callback then
-                task.spawn(Options.Buttons[1].Callback)
-            end
-            if Options.Buttons[1].ClosesUI then
-                Dismiss:Destroy()
-            end
-        end)
-    end
-    Dismiss.Visible = true
-    if not Options.NeverExpire then
-        task.delay(Options.Length, function()
-            if not Dismiss then return end
-            local c = {'Frame', 'ScrollingFrame'}
-            for i, v in next, Dismiss:GetDescendants() do
-                if v.ClassName:find("Text") then
-                    game:GetService("TweenService"):Create(v, TweenInfo.new(.4), {TextTransparency = 1}):Play()
-                else
-                    if table.find(c, v.ClassName) then
-                        game:GetService("TweenService"):Create(v, TweenInfo.new(.4), {Transparency = 1}):Play()
-                    end
-                end
-            end
-            task.wait(.4)
-            Dismiss:Destroy()
-        end)
-    end
+    end)
 end
 
--- Function to Find Closest Player
-function getClosestPlayerToCursor()
-    local closestPlayer
-    local shortestDistance = 137
+-- Create "N4.SHH" Button
+N4Button.Parent = Frame
+N4Button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+N4Button.Size = UDim2.new(1, -10, 0, 30)
+N4Button.Position = UDim2.new(0, 5, 0, 5)
+N4Button.Font = Enum.Font.Arcade
+N4Button.Text = "N4.SHH"
+N4Button.TextScaled = true
+N4Button.BackgroundTransparency = 0.3
+applyRainbowEffect(N4Button)
 
-    for _, v in pairs(game.Players:GetPlayers()) do
-        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 and v.Character:FindFirstChild("LowerTorso") then
-            local pos = CC:WorldToViewportPoint(v.Character.PrimaryPart.Position)
-            local magnitude = (Vector2.new(pos.X, pos.Y) - UserInputService:GetMouseLocation()).magnitude
-            if magnitude < shortestDistance then
-                closestPlayer = v
-                shortestDistance = magnitude
-            end
-        end
-    end
-    return closestPlayer
+-- Create "FOV" Button
+FOVButton.Parent = Frame
+FOVButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+FOVButton.Size = UDim2.new(1, -10, 0, 30)
+FOVButton.Position = UDim2.new(0, 5, 0, 45) -- Spaced below N4.SHH button
+FOVButton.Font = Enum.Font.Arcade
+FOVButton.Text = "FOV"
+FOVButton.TextScaled = true
+FOVButton.BackgroundTransparency = 0.3
+applyRainbowEffect(FOVButton)
+
+-- Silent Aim & FOV toggle variables
+local silentAimEnabled = false
+local fovEnabled = false
+local fovCircle = Drawing.new("Circle")
+
+-- Configure FOV circle
+fovCircle.Visible = false
+fovCircle.Color = Color3.new(0, 0, 0)
+fovCircle.Thickness = 1
+fovCircle.Radius = 100
+fovCircle.Filled = false
+fovCircle.Transparency = 1
+
+-- Function to get the user's ping
+local function getPing()
+    return game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
 end
 
--- Aimlock Logic: Use "Q" or Mobile Button
-UserInputService.InputBegan:Connect(function(keygo, ok)
-    if (not ok) then
-        if (keygo.KeyCode == Enum.KeyCode.Q) then
-            Locking = not Locking
-            if Locking then
-                Plr = getClosestPlayerToCursor()
-                CreateNotification({Title = "Faded.RBX", Content = "Locked onto: " .. (Plr and Plr.Character.Humanoid.DisplayName or "None"), Length = 3})
-            else
-                Plr = nil
-                CreateNotification({Title = "Faded.RBX", Content = "Unlocked", Length = 3})
+-- Function to find closest player to crosshair
+local function getClosestTarget()
+    local localPlayer = game.Players.LocalPlayer
+    local mouse = localPlayer:GetMouse()
+    local closestTarget = nil
+    local shortestDistance = math.huge
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= localPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local targetPos = game.Workspace.CurrentCamera:WorldToScreenPoint(player.Character.HumanoidRootPart.Position)
+            local distance = (Vector2.new(targetPos.X, targetPos.Y) - Vector2.new(mouse.X, mouse.Y)).Magnitude
+
+            if distance < shortestDistance and distance < 250 then -- Adjust range if needed
+                closestTarget = player
+                shortestDistance = distance
             end
         end
     end
-end)
+    return closestTarget
+end
 
--- Mobile Button Toggle
-AimlockButton.MouseButton1Click:Connect(function()
-    Locking = not Locking
-    if Locking then
-        Plr = getClosestPlayerToCursor()
-        CreateNotification({Title = "Faded.RBX", Content = "Locked onto: " .. (Plr and Plr.Character.Humanoid.DisplayName or "None"), Length = 3})
+-- Function to calculate prediction strength based on ping
+local function getPredictionStrength()
+    local ping = getPing()
+
+    if ping < 50 then
+        return 0.1 -- Minimal prediction for low ping
+    elseif ping < 150 then
+        return 0.3 -- Moderate prediction for medium ping
     else
-        Plr = nil
-        CreateNotification({Title = "Faded.RBX", Content = "Unlocked", Length = 3})
+        return 0.5 -- Aggressive prediction for high ping
+    end
+end
+
+-- Function to toggle silent aim
+local function toggleSilentAim()
+    silentAimEnabled = not silentAimEnabled
+
+    if silentAimEnabled then
+        local target = getClosestTarget()
+        if target and target.Character then
+            -- Prioritize head, but fallback to torso
+            local hitPart = target.Character:FindFirstChild("Head") or target.Character:FindFirstChild("HumanoidRootPart")
+            
+            -- Get prediction strength based on ping
+            local predictionStrength = getPredictionStrength()
+
+            -- Apply prediction offset to target position
+            local predictedPos = target.Character.HumanoidRootPart.Position + target.Character.HumanoidRootPart.Velocity * predictionStrength
+
+            -- Mark the target with a yellow dot
+            local dot = Instance.new("BillboardGui", hitPart)
+            dot.Size = UDim2.new(0, 10, 0, 10)
+            dot.StudsOffset = Vector3.new(0, 2, 0)
+
+            local frame = Instance.new("Frame", dot)
+            frame.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+            frame.Size = UDim2.new(1, 0, 1, 0)
+        end
+    end
+end
+
+-- Function to toggle FOV circle
+local function toggleFOV()
+    fovEnabled = not fovEnabled
+    fovCircle.Visible = fovEnabled
+end
+
+-- Button Click Events
+N4Button.MouseButton1Click:Connect(toggleSilentAim)
+FOVButton.MouseButton1Click:Connect(toggleFOV)
+
+-- Keybinds (Q for Silent Aim, C for FOV)
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Q then
+        toggleSilentAim()
+    elseif input.KeyCode == Enum.KeyCode.C then
+        toggleFOV()
+    end
+end)
+
+-- Update FOV circle position
+game:GetService("RunService").RenderStepped:Connect(function()
+    if fovEnabled then
+        local mousePos = game.Players.LocalPlayer:GetMouse().Hit.p
+        fovCircle.Position = Vector2.new(mousePos.X, mousePos.Y)
+    end
+end)
+
+-- Detect hits and send notifications
+game:GetService("Players").LocalPlayer.Character.Humanoid.Touched:Connect(function(hit)
+    local target = hit.Parent:FindFirstChildOfClass("Humanoid")
+    if target then
+        local partHit = hit.Name
+        Notify({
+            Title = "Hit Confirmed",
+            Description = "You hit " .. target.Parent.Name .. " on the " .. partHit,
+            Duration = 4,
+        })
     end
 end)
